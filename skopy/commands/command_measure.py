@@ -33,33 +33,35 @@ def command(context, metadata, database, verbose):
 
     image_records = []
 
-    for image_pathname in records["image"].unique():
-        image = skimage.io.imread(image_pathname)
+    with click.progressbar(records["image"].unique(), label="measuring images", length=len(records)) as image_pathnames:
+        for image_pathname in image_pathnames:
+            image = skimage.io.imread(image_pathname)
 
-        image_record = skopy.features.Image(image_pathname, image)
+            image_record = skopy.features.Image(image_pathname, image)
 
-        image_records.append(image_record)
+            image_records.append(image_record)
 
     session.add_all(image_records)
 
     instance_records = []
 
-    for _, record in records.iterrows():
-        image_pathname = record["image"]
-        label_pathname = record["label"]
+    with click.progressbar(records.iterrows(), label="measuring objects", length=len(records)) as records:
+        for _, record in records:
+            image_pathname = record["image"]
+            label_pathname = record["label"]
 
-        image = skimage.io.imread(image_pathname)
-        label = skimage.io.imread(label_pathname)
+            image = skimage.io.imread(image_pathname)
+            label = skimage.io.imread(label_pathname)
 
-        regions = skimage.measure.regionprops(label, image)
+            regions = skimage.measure.regionprops(label, image)
 
-        for region in regions:
-            instance_record = skopy.features.Instance(region)
+            for region in regions:
+                instance_record = skopy.features.Instance(region)
 
-            instance_record.image_pathname = image_pathname
-            instance_record.label_pathname = label_pathname
+                instance_record.image_pathname = image_pathname
+                instance_record.label_pathname = label_pathname
 
-            instance_records.append(instance_record)
+                instance_records.append(instance_record)
 
     session.add_all(instance_records)
 
