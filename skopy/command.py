@@ -10,8 +10,12 @@ class Command(click.MultiCommand):
         commands = os.path.abspath(os.path.join(os.path.dirname(__file__), "commands"))
 
         for filename in os.listdir(commands):
-            if filename.endswith(".py"):
-                rv.append(filename[4:-3])
+            if filename.endswith(".py") and filename.startswith("command_"):
+                _, name = filename.split("command_")
+
+                name, _ = name.split(".py")
+
+                rv.append(name)
 
         rv.sort()
 
@@ -22,7 +26,7 @@ class Command(click.MultiCommand):
             if sys.version_info[0] == 2:
                 name = name.encode("ascii", "replace")
 
-            name = "skopy.commands.cmd_" + name
+            name = "skopy.commands.command_" + name
 
             mod = __import__(name, None, None, ["command"])
         except ImportError:
@@ -33,7 +37,7 @@ class Command(click.MultiCommand):
 
 class Context:
     def __init__(self):
-        pass
+        self.image = None
 
 
 context_settings = {"auto_envvar_prefix": "SKOPY"}

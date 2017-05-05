@@ -1,0 +1,6 @@
+image,label
+skopy/data/images/1.png,skopy/data/labels/1.png
+skopy/data/images/2.png,skopy/data/labels/2.png
+skopy/data/images/3.png,skopy/data/labels/3.png
+skopy/data/images/4.png,skopy/data/labels/4.png
+skopy/data/images/5.png,skopy/data/labels/5.png

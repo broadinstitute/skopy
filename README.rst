@@ -1,16 +1,34 @@
-$ complex_
+skopy
+=====
 
-  complex is an example of building very complex cli
-  applications that load subcommands dynamically from
-  a plugin folder and other things.
+Installation
+------------
 
-  All the commands are implemented as plugins in the
-  `complex.commands` package.  If a python module is
-  placed named "cmd_foo" it will show up as "foo"
-  command and the `cli` object within it will be
-  loaded as nested Click command.
+`$ pip install skopy`
 
-Usage:
+Image processing
+----------------
 
-  $ pip install --editable .
-  $ complex --help
+Image segmentation
+------------------
+
+Measure
+-------
+
+Image
+-----
+
+Intensity
+---------
+
+Texture
+-------
+
+Object
+------
+
+Commands
+--------
+
+Writing custom commands
+-----------------------
