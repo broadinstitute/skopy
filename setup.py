@@ -9,8 +9,10 @@ setuptools.setup(
     include_package_data=True,
     install_requires=[
         "click",
+        "mahotas",
         "numpy",
-        "scikit-image"
+        "scikit-image",
+        "sqlalchemy"
     ],
     name="skopy",
     packages=[
