@@ -33,7 +33,7 @@ def command(context, metadata, database, verbose):
 
     image_records = []
 
-    with click.progressbar(records["image"].unique(), label="measuring images", length=len(records)) as image_pathnames:
+    with click.progressbar(records["image"].unique(), label="measuring images", length=len(records["image"].unique())) as image_pathnames:
         for image_pathname in image_pathnames:
             image = skimage.io.imread(image_pathname)
 
