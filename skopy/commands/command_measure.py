@@ -12,19 +12,14 @@ import sqlalchemy.orm
 
 @click.command("measure")
 @click.argument("metadata", nargs=1, type=click.Path(exists=True))
-@click.option(
-    "--connection",
-    default="sqlite:///measurements.sqlite",
-    nargs=1,
-    type=click.STRING
-)
+@click.option("--database", default="sqlite:///measurements.sqlite")
 @click.option("--verbose", is_flag=True)
 @skopy.command.pass_context
-def command(context, metadata, connection, verbose):
+def command(context, metadata, database, verbose):
     """
 
     """
-    engine = sqlalchemy.create_engine(connection, echo=verbose)
+    engine = sqlalchemy.create_engine(database, echo=verbose)
 
     skopy.features.Base.metadata.create_all(engine)
 
