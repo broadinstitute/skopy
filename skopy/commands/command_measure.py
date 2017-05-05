@@ -18,12 +18,13 @@ import sqlalchemy.orm
     nargs=1,
     type=click.STRING
 )
+@click.option("--verbose", is_flag=True)
 @skopy.command.pass_context
-def command(context, metadata, connection):
+def command(context, metadata, connection, verbose):
     """
 
     """
-    engine = sqlalchemy.create_engine(connection, echo=True)
+    engine = sqlalchemy.create_engine(connection, echo=verbose)
 
     skopy.features.Base.metadata.create_all(engine)
 
