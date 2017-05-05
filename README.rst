@@ -1,7 +1,7 @@
 skopy
 =====
 
-``$ skopy measure skopy/data/metadata.csv --measurements measurements.sqlite``
+``$ skopy measure skopy/data/metadata.csv``
 
 Installation
 ------------
