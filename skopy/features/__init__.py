@@ -975,6 +975,7 @@ class Instance(Base):
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
 
     axis_major = sqlalchemy.Column(sqlalchemy.Float)
+    axis_minor = sqlalchemy.Column(sqlalchemy.Float)
 
     bounding_box_x1 = sqlalchemy.Column(sqlalchemy.Float)
     bounding_box_x2 = sqlalchemy.Column(sqlalchemy.Float)
@@ -1365,7 +1366,8 @@ class Instance(Base):
     def __init__(self, instance):
         self.area = instance.area
 
-        self.axis_major = instance.minor_axis_length
+        self.axis_major = instance.major_axis_length
+        self.axis_minor = instance.minor_axis_length
 
         self.bounding_box_x1 = instance.bbox[0]
         self.bounding_box_x2 = instance.bbox[1]
