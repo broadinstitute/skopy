@@ -4,4 +4,4 @@ skopy
 Installation
 ------------
 
-`$ pip install skopy`
+``$ pip install skopy``
