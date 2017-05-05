@@ -1,4 +1,5 @@
 import mahotas.features
+import numpy
 import skimage.measure
 import sqlalchemy
 import sqlalchemy.ext.declarative
@@ -11,6 +12,17 @@ class Image(Base):
     __tablename__ = "images"
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+
+    intensity_integrated = sqlalchemy.Column(sqlalchemy.Float)
+    intensity_maximum = sqlalchemy.Column(sqlalchemy.Float)
+    intensity_mean = sqlalchemy.Column(sqlalchemy.Float)
+    intensity_median = sqlalchemy.Column(sqlalchemy.Float)
+    intensity_median_absolute_deviation = sqlalchemy.Column(sqlalchemy.Float)
+    intensity_minimum = sqlalchemy.Column(sqlalchemy.Float)
+    intensity_quartile_01 = sqlalchemy.Column(sqlalchemy.Float)
+    intensity_quartile_02 = sqlalchemy.Column(sqlalchemy.Float)
+    intensity_quartile_03 = sqlalchemy.Column(sqlalchemy.Float)
+    intensity_standard_deviation = sqlalchemy.Column(sqlalchemy.Float)
 
     moments_central_1_1 = sqlalchemy.Column(sqlalchemy.Float)
     moments_central_1_2 = sqlalchemy.Column(sqlalchemy.Float)
@@ -492,6 +504,17 @@ class Image(Base):
         threshold_adjacency_statistics = mahotas.features.tas(data)
 
         parameter_free_threshold_adjacency_statistics = mahotas.features.pftas(data)
+
+        self.intensity_integrated = numpy.sum(data)
+        self.intensity_maximum = numpy.max(data)
+        self.intensity_mean = numpy.mean(data)
+        self.intensity_median = numpy.median(data)
+        self.intensity_median_absolute_deviation = numpy.median(numpy.abs(numpy.ma.array(data).compressed() - numpy.median(data)))
+        self.intensity_minimum = numpy.min(data)
+        self.intensity_quartile_01 = numpy.percentile(data, 25)
+        self.intensity_quartile_02 = numpy.percentile(data, 50)
+        self.intensity_quartile_03 = numpy.percentile(data, 75)
+        self.intensity_standard_deviation = numpy.std(data)
 
         self.moments_central_1_1 = moments_central[0, 0]
         self.moments_central_1_2 = moments_central[0, 1]
@@ -987,9 +1010,16 @@ class Instance(Base):
     inertia_tensor_eigvals_1 = sqlalchemy.Column(sqlalchemy.Float)
     inertia_tensor_eigvals_2 = sqlalchemy.Column(sqlalchemy.Float)
 
+    intensity_integrated = sqlalchemy.Column(sqlalchemy.Float)
     intensity_maximum = sqlalchemy.Column(sqlalchemy.Float)
     intensity_mean = sqlalchemy.Column(sqlalchemy.Float)
+    intensity_median = sqlalchemy.Column(sqlalchemy.Float)
+    intensity_median_absolute_deviation = sqlalchemy.Column(sqlalchemy.Float)
     intensity_minimum = sqlalchemy.Column(sqlalchemy.Float)
+    intensity_quartile_01 = sqlalchemy.Column(sqlalchemy.Float)
+    intensity_quartile_02 = sqlalchemy.Column(sqlalchemy.Float)
+    intensity_quartile_03 = sqlalchemy.Column(sqlalchemy.Float)
+    intensity_standard_deviation = sqlalchemy.Column(sqlalchemy.Float)
 
     label_pathname = sqlalchemy.Column(sqlalchemy.String)
 
@@ -1090,9 +1120,16 @@ class Instance(Base):
         self.inertia_tensor_eigvals_1 = instance.inertia_tensor_eigvals[0]
         self.inertia_tensor_eigvals_2 = instance.inertia_tensor_eigvals[1]
 
+        self.intensity_integrated = numpy.sum(instance.intensity_image)
         self.intensity_maximum = instance.max_intensity
         self.intensity_mean = instance.mean_intensity
+        self.intensity_median = numpy.median(instance.intensity_image)
+        self.intensity_median_absolute_deviation = numpy.median(numpy.abs(numpy.ma.array(instance.intensity_image).compressed() - numpy.median(instance.intensity_image)))
         self.intensity_minimum = instance.min_intensity
+        self.intensity_quartile_01 = numpy.percentile(instance.intensity_image, 25)
+        self.intensity_quartile_02 = numpy.percentile(instance.intensity_image, 50)
+        self.intensity_quartile_03 = numpy.percentile(instance.intensity_image, 75)
+        self.intensity_standard_deviation = numpy.std(instance.intensity_image)
 
         self.moments_central_1_1 = instance.moments_central[0, 0]
         self.moments_central_1_2 = instance.moments_central[0, 1]
