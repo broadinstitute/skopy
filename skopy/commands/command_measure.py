@@ -28,14 +28,15 @@ def command(context, metadata, database, verbose):
 
     session = session()
 
-    records = pandas.read_csv(metadata)
+    metadata = pandas.read_csv(metadata)
 
-    for _, record in records.iterrows():
-        image = skopy.features.Image(record["image"], record["label"])
+    with click.progressbar(metadata.iterrows(), length=len(metadata)) as records:
+        for _, record in records:
+            image = skopy.features.Image(record["image"], record["label"])
 
-        session.add(image)
+            session.add(image)
 
-    for x, y in itertools.product(records["image"].unique(), records["label"].unique()):
+    for x, y in itertools.product(metadata["image"].unique(), metadata["label"].unique()):
         correlation = skopy.features.Correlation(x, y)
 
         session.add(correlation)
