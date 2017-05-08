@@ -1,6 +1,7 @@
 import mahotas.features
 import numpy
 import skimage.measure
+import skimage.io
 import sqlalchemy
 import sqlalchemy.ext.declarative
 import sqlalchemy.orm
@@ -12,6 +13,10 @@ class Image(Base):
     __tablename__ = "images"
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+
+    instances = sqlalchemy.orm.relationship("Instance", backref="image")
+
+    pathname = sqlalchemy.Column(sqlalchemy.String)
 
     intensity_integrated = sqlalchemy.Column(sqlalchemy.Float)
     intensity_maximum = sqlalchemy.Column(sqlalchemy.Float)
@@ -476,45 +481,45 @@ class Image(Base):
     parameter_free_threshold_adjacency_statistics_53 = sqlalchemy.Column(sqlalchemy.Float)
     parameter_free_threshold_adjacency_statistics_54 = sqlalchemy.Column(sqlalchemy.Float)
 
-    pathname = sqlalchemy.Column(sqlalchemy.String)
+    def __init__(self, image_pathname, label_pathname):
+        self.pathname = image_pathname
 
-    def __init__(self, pathname, data):
-        self.pathname = pathname
+        image = skimage.io.imread(image_pathname)
 
-        moments_spatial = skimage.measure.moments(data)
+        moments_spatial = skimage.measure.moments(image)
 
-        moments_central = skimage.measure.moments_central(data, moments_spatial[0, 1] / moments_spatial[0, 0], moments_spatial[1, 0] / moments_spatial[0, 0])
+        moments_central = skimage.measure.moments_central(image, moments_spatial[0, 1] / moments_spatial[0, 0], moments_spatial[1, 0] / moments_spatial[0, 0])
 
-        moments_hu = skimage.measure.moments_hu(data)
+        moments_hu = skimage.measure.moments_hu(image)
 
-        moments_normalized = skimage.measure.moments_normalized(data)
+        moments_normalized = skimage.measure.moments_normalized(image)
 
-        moments_zernike_01 = mahotas.features.zernike_moments(data, 1)
-        moments_zernike_02 = mahotas.features.zernike_moments(data, 2)
-        moments_zernike_03 = mahotas.features.zernike_moments(data, 3)
-        moments_zernike_04 = mahotas.features.zernike_moments(data, 4)
-        moments_zernike_05 = mahotas.features.zernike_moments(data, 5)
-        moments_zernike_06 = mahotas.features.zernike_moments(data, 6)
-        moments_zernike_07 = mahotas.features.zernike_moments(data, 7)
-        moments_zernike_08 = mahotas.features.zernike_moments(data, 8)
-        moments_zernike_09 = mahotas.features.zernike_moments(data, 9)
+        moments_zernike_01 = mahotas.features.zernike_moments(image, 1)
+        moments_zernike_02 = mahotas.features.zernike_moments(image, 2)
+        moments_zernike_03 = mahotas.features.zernike_moments(image, 3)
+        moments_zernike_04 = mahotas.features.zernike_moments(image, 4)
+        moments_zernike_05 = mahotas.features.zernike_moments(image, 5)
+        moments_zernike_06 = mahotas.features.zernike_moments(image, 6)
+        moments_zernike_07 = mahotas.features.zernike_moments(image, 7)
+        moments_zernike_08 = mahotas.features.zernike_moments(image, 8)
+        moments_zernike_09 = mahotas.features.zernike_moments(image, 9)
 
-        texture_haralick = mahotas.features.haralick(data, compute_14th_feature=True)
+        texture_haralick = mahotas.features.haralick(image, compute_14th_feature=True)
 
-        threshold_adjacency_statistics = mahotas.features.tas(data)
+        threshold_adjacency_statistics = mahotas.features.tas(image)
 
-        parameter_free_threshold_adjacency_statistics = mahotas.features.pftas(data)
+        parameter_free_threshold_adjacency_statistics = mahotas.features.pftas(image)
 
-        self.intensity_integrated = numpy.sum(data)
-        self.intensity_maximum = numpy.max(data)
-        self.intensity_mean = numpy.mean(data)
-        self.intensity_median = numpy.median(data)
-        self.intensity_median_absolute_deviation = numpy.median(numpy.abs(numpy.ma.array(data).compressed() - numpy.median(data)))
-        self.intensity_minimum = numpy.min(data)
-        self.intensity_quartile_01 = numpy.percentile(data, 25)
-        self.intensity_quartile_02 = numpy.percentile(data, 50)
-        self.intensity_quartile_03 = numpy.percentile(data, 75)
-        self.intensity_standard_deviation = numpy.std(data)
+        self.intensity_integrated = numpy.sum(image)
+        self.intensity_maximum = numpy.max(image)
+        self.intensity_mean = numpy.mean(image)
+        self.intensity_median = numpy.median(image)
+        self.intensity_median_absolute_deviation = numpy.median(numpy.abs(numpy.ma.array(image).compressed() - numpy.median(image)))
+        self.intensity_minimum = numpy.min(image)
+        self.intensity_quartile_01 = numpy.percentile(image, 25)
+        self.intensity_quartile_02 = numpy.percentile(image, 50)
+        self.intensity_quartile_03 = numpy.percentile(image, 75)
+        self.intensity_standard_deviation = numpy.std(image)
 
         self.moments_central_1_1 = moments_central[0, 0]
         self.moments_central_1_2 = moments_central[0, 1]
@@ -968,11 +973,22 @@ class Image(Base):
         self.parameter_free_threshold_adjacency_statistics_53 = parameter_free_threshold_adjacency_statistics[52]
         self.parameter_free_threshold_adjacency_statistics_54 = parameter_free_threshold_adjacency_statistics[53]
 
+        label = skimage.io.imread(label_pathname)
+
+        for properties in skimage.measure.regionprops(label, image):
+            instance = Instance(label_pathname, properties)
+
+            self.instances.append(instance)
+
 
 class Instance(Base):
     __tablename__ = "instances"
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+
+    image_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("images.id"))
+
+    pathname = sqlalchemy.Column(sqlalchemy.String)
 
     axis_major = sqlalchemy.Column(sqlalchemy.Float)
     axis_minor = sqlalchemy.Column(sqlalchemy.Float)
@@ -1363,128 +1379,130 @@ class Instance(Base):
     texture_haralick_04_13 = sqlalchemy.Column(sqlalchemy.Float)
     texture_haralick_04_14 = sqlalchemy.Column(sqlalchemy.Float)
 
-    def __init__(self, instance):
-        self.area = instance.area
+    def __init__(self, pathname, properties):
+        self.pathname = pathname
 
-        self.axis_major = instance.major_axis_length
-        self.axis_minor = instance.minor_axis_length
+        self.area = properties.area
 
-        self.bounding_box_x1 = instance.bbox[0]
-        self.bounding_box_x2 = instance.bbox[1]
-        self.bounding_box_y1 = instance.bbox[2]
-        self.bounding_box_y2 = instance.bbox[3]
+        self.axis_major = properties.major_axis_length
+        self.axis_minor = properties.minor_axis_length
 
-        self.centroid_weighted_local_x = instance.weighted_local_centroid[0]
-        self.centroid_weighted_local_y = instance.weighted_local_centroid[1]
+        self.bounding_box_x1 = properties.bbox[0]
+        self.bounding_box_x2 = properties.bbox[1]
+        self.bounding_box_y1 = properties.bbox[2]
+        self.bounding_box_y2 = properties.bbox[3]
 
-        self.centroid_weighted_x = instance.weighted_centroid[0]
-        self.centroid_weighted_y = instance.weighted_centroid[1]
+        self.centroid_weighted_local_x = properties.weighted_local_centroid[0]
+        self.centroid_weighted_local_y = properties.weighted_local_centroid[1]
 
-        self.centroid_x = instance.centroid[0]
-        self.centroid_y = instance.centroid[1]
+        self.centroid_weighted_x = properties.weighted_centroid[0]
+        self.centroid_weighted_y = properties.weighted_centroid[1]
 
-        self.convex_area = instance.convex_area
+        self.centroid_x = properties.centroid[0]
+        self.centroid_y = properties.centroid[1]
 
-        self.eccentricity = instance.eccentricity
+        self.convex_area = properties.convex_area
 
-        self.equivalent_diameter = instance.equivalent_diameter
+        self.eccentricity = properties.eccentricity
 
-        self.euler_number = instance.euler_number
+        self.equivalent_diameter = properties.equivalent_diameter
 
-        self.extent = instance.extent
+        self.euler_number = properties.euler_number
 
-        self.filled_area = instance.filled_area
+        self.extent = properties.extent
 
-        self.index = instance.label
+        self.filled_area = properties.filled_area
 
-        self.inertia_tensor_1_1 = instance.inertia_tensor[0, 0]
-        self.inertia_tensor_1_2 = instance.inertia_tensor[0, 1]
-        self.inertia_tensor_2_1 = instance.inertia_tensor[1, 0]
-        self.inertia_tensor_2_2 = instance.inertia_tensor[1, 1]
+        self.index = properties.label
 
-        self.inertia_tensor_eigvals_1 = instance.inertia_tensor_eigvals[0]
-        self.inertia_tensor_eigvals_2 = instance.inertia_tensor_eigvals[1]
+        self.inertia_tensor_1_1 = properties.inertia_tensor[0, 0]
+        self.inertia_tensor_1_2 = properties.inertia_tensor[0, 1]
+        self.inertia_tensor_2_1 = properties.inertia_tensor[1, 0]
+        self.inertia_tensor_2_2 = properties.inertia_tensor[1, 1]
 
-        self.intensity_integrated = numpy.sum(instance.intensity_image)
-        self.intensity_maximum = instance.max_intensity
-        self.intensity_mean = instance.mean_intensity
-        self.intensity_median = numpy.median(instance.intensity_image)
-        self.intensity_median_absolute_deviation = numpy.median(numpy.abs(numpy.ma.array(instance.intensity_image).compressed() - numpy.median(instance.intensity_image)))
-        self.intensity_minimum = instance.min_intensity
-        self.intensity_quartile_01 = numpy.percentile(instance.intensity_image, 25)
-        self.intensity_quartile_02 = numpy.percentile(instance.intensity_image, 50)
-        self.intensity_quartile_03 = numpy.percentile(instance.intensity_image, 75)
-        self.intensity_standard_deviation = numpy.std(instance.intensity_image)
+        self.inertia_tensor_eigvals_1 = properties.inertia_tensor_eigvals[0]
+        self.inertia_tensor_eigvals_2 = properties.inertia_tensor_eigvals[1]
 
-        self.moments_central_1_1 = instance.moments_central[0, 0]
-        self.moments_central_1_2 = instance.moments_central[0, 1]
-        self.moments_central_1_3 = instance.moments_central[0, 2]
-        self.moments_central_2_1 = instance.moments_central[1, 0]
-        self.moments_central_2_2 = instance.moments_central[1, 1]
-        self.moments_central_2_3 = instance.moments_central[1, 2]
-        self.moments_central_3_1 = instance.moments_central[2, 0]
-        self.moments_central_3_2 = instance.moments_central[2, 1]
-        self.moments_central_3_3 = instance.moments_central[2, 2]
+        self.intensity_integrated = numpy.sum(properties.intensity_image)
+        self.intensity_maximum = properties.max_intensity
+        self.intensity_mean = properties.mean_intensity
+        self.intensity_median = numpy.median(properties.intensity_image)
+        self.intensity_median_absolute_deviation = numpy.median(numpy.abs(numpy.ma.array(properties.intensity_image).compressed() - numpy.median(properties.intensity_image)))
+        self.intensity_minimum = properties.min_intensity
+        self.intensity_quartile_01 = numpy.percentile(properties.intensity_image, 25)
+        self.intensity_quartile_02 = numpy.percentile(properties.intensity_image, 50)
+        self.intensity_quartile_03 = numpy.percentile(properties.intensity_image, 75)
+        self.intensity_standard_deviation = numpy.std(properties.intensity_image)
 
-        self.moments_normalized_1_1 = instance.moments_normalized[0, 0]
-        self.moments_normalized_1_2 = instance.moments_normalized[0, 1]
-        self.moments_normalized_1_3 = instance.moments_normalized[0, 2]
-        self.moments_normalized_2_1 = instance.moments_normalized[1, 0]
-        self.moments_normalized_2_2 = instance.moments_normalized[1, 1]
-        self.moments_normalized_2_3 = instance.moments_normalized[1, 2]
-        self.moments_normalized_3_1 = instance.moments_normalized[2, 0]
-        self.moments_normalized_3_2 = instance.moments_normalized[2, 1]
-        self.moments_normalized_3_3 = instance.moments_normalized[2, 2]
+        self.moments_central_1_1 = properties.moments_central[0, 0]
+        self.moments_central_1_2 = properties.moments_central[0, 1]
+        self.moments_central_1_3 = properties.moments_central[0, 2]
+        self.moments_central_2_1 = properties.moments_central[1, 0]
+        self.moments_central_2_2 = properties.moments_central[1, 1]
+        self.moments_central_2_3 = properties.moments_central[1, 2]
+        self.moments_central_3_1 = properties.moments_central[2, 0]
+        self.moments_central_3_2 = properties.moments_central[2, 1]
+        self.moments_central_3_3 = properties.moments_central[2, 2]
 
-        self.moments_spatial_1_1 = instance.moments[0, 0]
-        self.moments_spatial_1_2 = instance.moments[0, 1]
-        self.moments_spatial_1_3 = instance.moments[0, 2]
-        self.moments_spatial_2_1 = instance.moments[1, 0]
-        self.moments_spatial_2_2 = instance.moments[1, 1]
-        self.moments_spatial_2_3 = instance.moments[1, 2]
-        self.moments_spatial_3_1 = instance.moments[2, 0]
-        self.moments_spatial_3_2 = instance.moments[2, 1]
-        self.moments_spatial_3_3 = instance.moments[2, 2]
+        self.moments_normalized_1_1 = properties.moments_normalized[0, 0]
+        self.moments_normalized_1_2 = properties.moments_normalized[0, 1]
+        self.moments_normalized_1_3 = properties.moments_normalized[0, 2]
+        self.moments_normalized_2_1 = properties.moments_normalized[1, 0]
+        self.moments_normalized_2_2 = properties.moments_normalized[1, 1]
+        self.moments_normalized_2_3 = properties.moments_normalized[1, 2]
+        self.moments_normalized_3_1 = properties.moments_normalized[2, 0]
+        self.moments_normalized_3_2 = properties.moments_normalized[2, 1]
+        self.moments_normalized_3_3 = properties.moments_normalized[2, 2]
 
-        self.moments_weighted_central_1_1 = instance.weighted_moments_central[0, 0]
-        self.moments_weighted_central_1_2 = instance.weighted_moments_central[0, 1]
-        self.moments_weighted_central_1_3 = instance.weighted_moments_central[0, 2]
-        self.moments_weighted_central_2_1 = instance.weighted_moments_central[1, 0]
-        self.moments_weighted_central_2_2 = instance.weighted_moments_central[1, 1]
-        self.moments_weighted_central_2_3 = instance.weighted_moments_central[1, 2]
-        self.moments_weighted_central_3_1 = instance.weighted_moments_central[2, 0]
-        self.moments_weighted_central_3_2 = instance.weighted_moments_central[2, 1]
-        self.moments_weighted_central_3_3 = instance.weighted_moments_central[2, 2]
+        self.moments_spatial_1_1 = properties.moments[0, 0]
+        self.moments_spatial_1_2 = properties.moments[0, 1]
+        self.moments_spatial_1_3 = properties.moments[0, 2]
+        self.moments_spatial_2_1 = properties.moments[1, 0]
+        self.moments_spatial_2_2 = properties.moments[1, 1]
+        self.moments_spatial_2_3 = properties.moments[1, 2]
+        self.moments_spatial_3_1 = properties.moments[2, 0]
+        self.moments_spatial_3_2 = properties.moments[2, 1]
+        self.moments_spatial_3_3 = properties.moments[2, 2]
 
-        self.moments_weighted_normalized_1_1 = instance.weighted_moments_normalized[0, 0]
-        self.moments_weighted_normalized_1_2 = instance.weighted_moments_normalized[0, 1]
-        self.moments_weighted_normalized_1_3 = instance.weighted_moments_normalized[0, 2]
-        self.moments_weighted_normalized_2_1 = instance.weighted_moments_normalized[1, 0]
-        self.moments_weighted_normalized_2_2 = instance.weighted_moments_normalized[1, 1]
-        self.moments_weighted_normalized_2_3 = instance.weighted_moments_normalized[1, 2]
-        self.moments_weighted_normalized_3_1 = instance.weighted_moments_normalized[2, 0]
-        self.moments_weighted_normalized_3_2 = instance.weighted_moments_normalized[2, 1]
-        self.moments_weighted_normalized_3_3 = instance.weighted_moments_normalized[2, 2]
+        self.moments_weighted_central_1_1 = properties.weighted_moments_central[0, 0]
+        self.moments_weighted_central_1_2 = properties.weighted_moments_central[0, 1]
+        self.moments_weighted_central_1_3 = properties.weighted_moments_central[0, 2]
+        self.moments_weighted_central_2_1 = properties.weighted_moments_central[1, 0]
+        self.moments_weighted_central_2_2 = properties.weighted_moments_central[1, 1]
+        self.moments_weighted_central_2_3 = properties.weighted_moments_central[1, 2]
+        self.moments_weighted_central_3_1 = properties.weighted_moments_central[2, 0]
+        self.moments_weighted_central_3_2 = properties.weighted_moments_central[2, 1]
+        self.moments_weighted_central_3_3 = properties.weighted_moments_central[2, 2]
 
-        self.moments_weighted_spatial_1_1 = instance.weighted_moments[0, 0]
-        self.moments_weighted_spatial_1_2 = instance.weighted_moments[0, 1]
-        self.moments_weighted_spatial_1_3 = instance.weighted_moments[0, 2]
-        self.moments_weighted_spatial_2_1 = instance.weighted_moments[1, 0]
-        self.moments_weighted_spatial_2_2 = instance.weighted_moments[1, 1]
-        self.moments_weighted_spatial_2_3 = instance.weighted_moments[1, 2]
-        self.moments_weighted_spatial_3_1 = instance.weighted_moments[2, 0]
-        self.moments_weighted_spatial_3_2 = instance.weighted_moments[2, 1]
-        self.moments_weighted_spatial_3_3 = instance.weighted_moments[2, 2]
+        self.moments_weighted_normalized_1_1 = properties.weighted_moments_normalized[0, 0]
+        self.moments_weighted_normalized_1_2 = properties.weighted_moments_normalized[0, 1]
+        self.moments_weighted_normalized_1_3 = properties.weighted_moments_normalized[0, 2]
+        self.moments_weighted_normalized_2_1 = properties.weighted_moments_normalized[1, 0]
+        self.moments_weighted_normalized_2_2 = properties.weighted_moments_normalized[1, 1]
+        self.moments_weighted_normalized_2_3 = properties.weighted_moments_normalized[1, 2]
+        self.moments_weighted_normalized_3_1 = properties.weighted_moments_normalized[2, 0]
+        self.moments_weighted_normalized_3_2 = properties.weighted_moments_normalized[2, 1]
+        self.moments_weighted_normalized_3_3 = properties.weighted_moments_normalized[2, 2]
 
-        moments_zernike_01 = mahotas.features.zernike_moments(instance.intensity_image, 1)
-        moments_zernike_02 = mahotas.features.zernike_moments(instance.intensity_image, 2)
-        moments_zernike_03 = mahotas.features.zernike_moments(instance.intensity_image, 3)
-        moments_zernike_04 = mahotas.features.zernike_moments(instance.intensity_image, 4)
-        moments_zernike_05 = mahotas.features.zernike_moments(instance.intensity_image, 5)
-        moments_zernike_06 = mahotas.features.zernike_moments(instance.intensity_image, 6)
-        moments_zernike_07 = mahotas.features.zernike_moments(instance.intensity_image, 7)
-        moments_zernike_08 = mahotas.features.zernike_moments(instance.intensity_image, 8)
-        moments_zernike_09 = mahotas.features.zernike_moments(instance.intensity_image, 9)
+        self.moments_weighted_spatial_1_1 = properties.weighted_moments[0, 0]
+        self.moments_weighted_spatial_1_2 = properties.weighted_moments[0, 1]
+        self.moments_weighted_spatial_1_3 = properties.weighted_moments[0, 2]
+        self.moments_weighted_spatial_2_1 = properties.weighted_moments[1, 0]
+        self.moments_weighted_spatial_2_2 = properties.weighted_moments[1, 1]
+        self.moments_weighted_spatial_2_3 = properties.weighted_moments[1, 2]
+        self.moments_weighted_spatial_3_1 = properties.weighted_moments[2, 0]
+        self.moments_weighted_spatial_3_2 = properties.weighted_moments[2, 1]
+        self.moments_weighted_spatial_3_3 = properties.weighted_moments[2, 2]
+
+        moments_zernike_01 = mahotas.features.zernike_moments(properties.intensity_image, 1)
+        moments_zernike_02 = mahotas.features.zernike_moments(properties.intensity_image, 2)
+        moments_zernike_03 = mahotas.features.zernike_moments(properties.intensity_image, 3)
+        moments_zernike_04 = mahotas.features.zernike_moments(properties.intensity_image, 4)
+        moments_zernike_05 = mahotas.features.zernike_moments(properties.intensity_image, 5)
+        moments_zernike_06 = mahotas.features.zernike_moments(properties.intensity_image, 6)
+        moments_zernike_07 = mahotas.features.zernike_moments(properties.intensity_image, 7)
+        moments_zernike_08 = mahotas.features.zernike_moments(properties.intensity_image, 8)
+        moments_zernike_09 = mahotas.features.zernike_moments(properties.intensity_image, 9)
 
         self.moments_zernike_01_01 = moments_zernike_01[1 - 1]
         self.moments_zernike_01_02 = moments_zernike_01[2 - 1]
@@ -1712,13 +1730,13 @@ class Instance(Base):
         self.moments_zernike_09_24 = moments_zernike_09[24 - 1]
         self.moments_zernike_09_25 = moments_zernike_09[25 - 1]
 
-        self.orientation = instance.orientation
+        self.orientation = properties.orientation
 
-        self.perimeter = instance.perimeter
+        self.perimeter = properties.perimeter
 
-        self.solidity = instance.solidity
+        self.solidity = properties.solidity
 
-        texture_haralick = mahotas.features.haralick(instance.intensity_image, compute_14th_feature=True)
+        texture_haralick = mahotas.features.haralick(properties.intensity_image, compute_14th_feature=True)
 
         self.texture_haralick_01_01 = texture_haralick[0, 0]
         self.texture_haralick_01_02 = texture_haralick[0, 1]
