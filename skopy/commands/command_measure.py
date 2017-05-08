@@ -3,8 +3,6 @@
 import click
 import itertools
 import pandas
-import skimage.io
-import skimage.measure
 import skopy.command
 import skopy.features
 import sqlalchemy
