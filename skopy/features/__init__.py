@@ -86,11 +86,11 @@ class Image(Base):
     moments_hu_6 = sqlalchemy.Column(sqlalchemy.Float)
     moments_hu_7 = sqlalchemy.Column(sqlalchemy.Float)
 
-    moments_normalized_1_1 = sqlalchemy.Column(sqlalchemy.Float)
-    moments_normalized_1_2 = sqlalchemy.Column(sqlalchemy.Float)
+    # moments_normalized_1_1 = sqlalchemy.Column(sqlalchemy.Float)
+    # moments_normalized_1_2 = sqlalchemy.Column(sqlalchemy.Float)
     moments_normalized_1_3 = sqlalchemy.Column(sqlalchemy.Float)
     moments_normalized_1_4 = sqlalchemy.Column(sqlalchemy.Float)
-    moments_normalized_2_1 = sqlalchemy.Column(sqlalchemy.Float)
+    # moments_normalized_2_1 = sqlalchemy.Column(sqlalchemy.Float)
     moments_normalized_2_2 = sqlalchemy.Column(sqlalchemy.Float)
     moments_normalized_2_3 = sqlalchemy.Column(sqlalchemy.Float)
     moments_normalized_2_4 = sqlalchemy.Column(sqlalchemy.Float)
@@ -580,11 +580,11 @@ class Image(Base):
         self.moments_hu_6 = moments_hu[5]
         self.moments_hu_7 = moments_hu[6]
 
-        self.moments_normalized_1_1 = moments_normalized[0, 0]
-        self.moments_normalized_1_2 = moments_normalized[0, 1]
+        # self.moments_normalized_1_1 = moments_normalized[0, 0]
+        # self.moments_normalized_1_2 = moments_normalized[0, 1]
         self.moments_normalized_1_3 = moments_normalized[0, 2]
         self.moments_normalized_1_4 = moments_normalized[0, 3]
-        self.moments_normalized_2_1 = moments_normalized[1, 0]
+        # self.moments_normalized_2_1 = moments_normalized[1, 0]
         self.moments_normalized_2_2 = moments_normalized[1, 1]
         self.moments_normalized_2_3 = moments_normalized[1, 2]
         self.moments_normalized_2_4 = moments_normalized[1, 3]
@@ -1086,10 +1086,10 @@ class Instance(Base):
     moments_central_3_2 = sqlalchemy.Column(sqlalchemy.Float)
     moments_central_3_3 = sqlalchemy.Column(sqlalchemy.Float)
 
-    moments_normalized_1_1 = sqlalchemy.Column(sqlalchemy.Float)
-    moments_normalized_1_2 = sqlalchemy.Column(sqlalchemy.Float)
+    # moments_normalized_1_1 = sqlalchemy.Column(sqlalchemy.Float)
+    # moments_normalized_1_2 = sqlalchemy.Column(sqlalchemy.Float)
     moments_normalized_1_3 = sqlalchemy.Column(sqlalchemy.Float)
-    moments_normalized_2_1 = sqlalchemy.Column(sqlalchemy.Float)
+    # moments_normalized_2_1 = sqlalchemy.Column(sqlalchemy.Float)
     moments_normalized_2_2 = sqlalchemy.Column(sqlalchemy.Float)
     moments_normalized_2_3 = sqlalchemy.Column(sqlalchemy.Float)
     moments_normalized_3_1 = sqlalchemy.Column(sqlalchemy.Float)
@@ -1106,10 +1106,10 @@ class Instance(Base):
     moments_spatial_3_2 = sqlalchemy.Column(sqlalchemy.Float)
     moments_spatial_3_3 = sqlalchemy.Column(sqlalchemy.Float)
 
-    moments_weighted_normalized_1_1 = sqlalchemy.Column(sqlalchemy.Float)
-    moments_weighted_normalized_1_2 = sqlalchemy.Column(sqlalchemy.Float)
+    # moments_weighted_normalized_1_1 = sqlalchemy.Column(sqlalchemy.Float)
+    # moments_weighted_normalized_1_2 = sqlalchemy.Column(sqlalchemy.Float)
     moments_weighted_normalized_1_3 = sqlalchemy.Column(sqlalchemy.Float)
-    moments_weighted_normalized_2_1 = sqlalchemy.Column(sqlalchemy.Float)
+    # moments_weighted_normalized_2_1 = sqlalchemy.Column(sqlalchemy.Float)
     moments_weighted_normalized_2_2 = sqlalchemy.Column(sqlalchemy.Float)
     moments_weighted_normalized_2_3 = sqlalchemy.Column(sqlalchemy.Float)
     moments_weighted_normalized_3_1 = sqlalchemy.Column(sqlalchemy.Float)
@@ -1482,10 +1482,10 @@ class Instance(Base):
         self.moments_central_3_2 = properties.moments_central[2, 1]
         self.moments_central_3_3 = properties.moments_central[2, 2]
 
-        self.moments_normalized_1_1 = properties.moments_normalized[0, 0]
-        self.moments_normalized_1_2 = properties.moments_normalized[0, 1]
+        # self.moments_normalized_1_1 = properties.moments_normalized[0, 0]
+        # self.moments_normalized_1_2 = properties.moments_normalized[0, 1]
         self.moments_normalized_1_3 = properties.moments_normalized[0, 2]
-        self.moments_normalized_2_1 = properties.moments_normalized[1, 0]
+        # self.moments_normalized_2_1 = properties.moments_normalized[1, 0]
         self.moments_normalized_2_2 = properties.moments_normalized[1, 1]
         self.moments_normalized_2_3 = properties.moments_normalized[1, 2]
         self.moments_normalized_3_1 = properties.moments_normalized[2, 0]
@@ -1512,10 +1512,10 @@ class Instance(Base):
         self.moments_weighted_central_3_2 = properties.weighted_moments_central[2, 1]
         self.moments_weighted_central_3_3 = properties.weighted_moments_central[2, 2]
 
-        self.moments_weighted_normalized_1_1 = properties.weighted_moments_normalized[0, 0]
-        self.moments_weighted_normalized_1_2 = properties.weighted_moments_normalized[0, 1]
+        # self.moments_weighted_normalized_1_1 = properties.weighted_moments_normalized[0, 0]
+        # self.moments_weighted_normalized_1_2 = properties.weighted_moments_normalized[0, 1]
         self.moments_weighted_normalized_1_3 = properties.weighted_moments_normalized[0, 2]
-        self.moments_weighted_normalized_2_1 = properties.weighted_moments_normalized[1, 0]
+        # self.moments_weighted_normalized_2_1 = properties.weighted_moments_normalized[1, 0]
         self.moments_weighted_normalized_2_2 = properties.weighted_moments_normalized[1, 1]
         self.moments_weighted_normalized_2_3 = properties.weighted_moments_normalized[1, 2]
         self.moments_weighted_normalized_3_1 = properties.weighted_moments_normalized[2, 0]
