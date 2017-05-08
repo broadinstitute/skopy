@@ -513,6 +513,8 @@ class Image(Base):
     parameter_free_threshold_adjacency_statistics_53 = sqlalchemy.Column(sqlalchemy.Float)
     parameter_free_threshold_adjacency_statistics_54 = sqlalchemy.Column(sqlalchemy.Float)
 
+    shannon_entropy = sqlalchemy.Column(sqlalchemy.Float)
+
     def __init__(self, image_pathname, label_pathname):
         self.pathname = image_pathname
 
@@ -1005,6 +1007,8 @@ class Image(Base):
         self.parameter_free_threshold_adjacency_statistics_53 = parameter_free_threshold_adjacency_statistics[52]
         self.parameter_free_threshold_adjacency_statistics_54 = parameter_free_threshold_adjacency_statistics[53]
 
+        self.shannon_entropy = skimage.measure.shannon_entropy(image)
+
         label = skimage.io.imread(label_pathname)
 
         for properties in skimage.measure.regionprops(label, image):
@@ -1411,6 +1415,8 @@ class Instance(Base):
     texture_haralick_04_13 = sqlalchemy.Column(sqlalchemy.Float)
     texture_haralick_04_14 = sqlalchemy.Column(sqlalchemy.Float)
 
+    shannon_entropy = sqlalchemy.Column(sqlalchemy.Float)
+
     def __init__(self, pathname, properties):
         self.pathname = pathname
 
@@ -1765,6 +1771,8 @@ class Instance(Base):
         self.orientation = properties.orientation
 
         self.perimeter = properties.perimeter
+
+        self.shannon_entropy = skimage.measure.shannon_entropy(properties.intensity_image)
 
         self.solidity = properties.solidity
 
