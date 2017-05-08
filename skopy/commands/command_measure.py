@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import click
+import itertools
 import pandas
 import skimage.io
 import skimage.measure
@@ -36,5 +37,9 @@ def command(context, metadata, database, verbose):
 
         session.add(image)
 
-    session.commit()
+    for x, y in itertools.product(records["image"].unique(), records["label"].unique()):
+        correlation = skopy.features.Correlation(x, y)
 
+        session.add(correlation)
+
+    session.commit()
