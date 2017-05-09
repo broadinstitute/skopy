@@ -49,4 +49,3 @@ class Intensity(Base):
         self.quartile_3 = numpy.percentile(image, 75)
 
         self.standard_deviation = numpy.std(image)
-
