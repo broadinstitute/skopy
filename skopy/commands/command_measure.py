@@ -1,26 +1,27 @@
 # -*- coding: utf-8 -*-
 
-import click
 import itertools
+
+import click
 import pandas
-import skopy.command
-import skopy.features
 import sqlalchemy
 import sqlalchemy.orm
+
+import skopy.command
+import skopy.feature
 
 
 @click.command("measure")
 @click.argument("metadata", nargs=1, type=click.Path(exists=True))
 @click.option("--database", default="sqlite:///measurements.sqlite")
-@click.option("--verbose", is_flag=True)
-@skopy.command.pass_context
-def command(context, metadata, database, verbose):
+@click.option("--verbose", is_flag=False)
+def command(metadata, database, verbose):
     """
 
     """
     engine = sqlalchemy.create_engine(database, echo=verbose)
 
-    skopy.features.Base.metadata.create_all(engine)
+    skopy.feature.Base.metadata.create_all(engine)
 
     session = sqlalchemy.orm.sessionmaker()
 
@@ -30,14 +31,18 @@ def command(context, metadata, database, verbose):
 
     metadata = pandas.read_csv(metadata)
 
-    with click.progressbar(metadata.iterrows(), length=len(metadata)) as records:
-        for _, record in records:
-            image = skopy.features.Image(record["image"], record["label"])
+    pairs = [(image, mask) for _, image, mask in metadata.itertuples()]
+
+    with click.progressbar(pairs) as pairs:
+        for pathname, mask in pairs:
+            image = skopy.feature.Image(pathname, mask)
 
             session.add(image)
 
-    for x, y in itertools.product(metadata["image"].unique(), metadata["label"].unique()):
-        correlation = skopy.features.Correlation(x, y)
+    pairs = itertools.product(metadata["image"].unique(), metadata["label"].unique())
+
+    for x, y in pairs:
+        correlation = skopy.feature.Correlation(x, y)
 
         session.add(correlation)
 
