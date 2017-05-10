@@ -25,7 +25,7 @@ class Moment(Base):
 
     description = sqlalchemy.Column(sqlalchemy.Enum(MomentType))
 
-    instance_id = sqlalchemy.Column(sqlalchemy_utils.UUIDType(binary=False), sqlalchemy.ForeignKey("instances.id"))
+    instance_id = sqlalchemy.Column(sqlalchemy_utils.UUIDType(), sqlalchemy.ForeignKey("instances.id"))
 
     p = sqlalchemy.Column(sqlalchemy.Integer)
     q = sqlalchemy.Column(sqlalchemy.Integer)
