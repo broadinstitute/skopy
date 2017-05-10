@@ -4,7 +4,6 @@ import os.path
 
 import click
 import pandas
-import sqlalchemy
 
 from skopy.task import measure
 

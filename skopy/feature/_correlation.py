@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import skimage.io
 import skimage.measure
 import sqlalchemy

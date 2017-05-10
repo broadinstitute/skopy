@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import enum
 import uuid
 
@@ -36,13 +38,18 @@ class Moment(Base):
 
     @staticmethod
     def measure(description, p, q, moments, weighted):
+        if description is MomentType.zernike:
+            y = 0 if numpy.isnan(moments[p + 1][q] ) else moments[p + 1][q]
+        else:
+            y = 0 if numpy.isnan(moments[p, q]) else moments[p, q]
+
         parameters = {
             "description": description,
             "id": uuid.uuid4(),
             "p": p + 1,
             "q": q + 1,
             "weighted": weighted,
-            "y": 0 if numpy.isnan(moments[p, q]) else moments[p, q]
+            "y": y
         }
 
         return Moment(**parameters)
