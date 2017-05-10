@@ -1,3 +1,7 @@
 import sqlalchemy.ext.declarative
+import sqlalchemy_utils
 
-Base = sqlalchemy.ext.declarative.declarative_base()
+
+@sqlalchemy.ext.declarative.as_declarative()
+class Base:
+    id = sqlalchemy.Column(sqlalchemy_utils.UUIDType(binary=False), primary_key=True)

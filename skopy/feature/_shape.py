@@ -1,7 +1,6 @@
 import uuid
 
 import sqlalchemy
-import sqlalchemy_utils
 
 from ._base import Base
 
@@ -23,8 +22,6 @@ class Shape(Base):
     euler_number = sqlalchemy.Column(sqlalchemy.Integer)
 
     extent = sqlalchemy.Column(sqlalchemy.Float)
-
-    id = sqlalchemy.Column(sqlalchemy_utils.UUIDType(binary=False), primary_key=True)
 
     orientation = sqlalchemy.Column(sqlalchemy.Float)
 

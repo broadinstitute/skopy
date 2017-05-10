@@ -2,15 +2,12 @@ import uuid
 
 import numpy
 import sqlalchemy
-import sqlalchemy_utils
 
 from ._base import Base
 
 
 class Intensity(Base):
     __tablename__ = "intensities"
-
-    id = sqlalchemy.Column(sqlalchemy_utils.UUIDType(binary=False), primary_key=True)
 
     integrated = sqlalchemy.Column(sqlalchemy.Float)
 

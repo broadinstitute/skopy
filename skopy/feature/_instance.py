@@ -16,8 +16,6 @@ class Instance(Base):
     centroid_x = sqlalchemy.Column(sqlalchemy.Integer)
     centroid_y = sqlalchemy.Column(sqlalchemy.Integer)
 
-    id = sqlalchemy.Column(sqlalchemy_utils.UUIDType(binary=False), primary_key=True)
-
     image_id = sqlalchemy.Column(sqlalchemy_utils.UUIDType(binary=False), sqlalchemy.ForeignKey("images.id"))
 
     index = sqlalchemy.Column(sqlalchemy.Integer)

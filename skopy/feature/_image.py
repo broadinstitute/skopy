@@ -10,8 +10,6 @@ from ._base import Base
 class Image(Base):
     __tablename__ = "images"
 
-    id = sqlalchemy.Column(sqlalchemy_utils.UUIDType(binary=False), primary_key=True)
-
     instances = sqlalchemy.orm.relationship("Instance", backref="image")
 
     intensity_id = sqlalchemy.Column(sqlalchemy_utils.UUIDType(binary=False), sqlalchemy.ForeignKey("intensities.id"))

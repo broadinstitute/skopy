@@ -3,7 +3,7 @@ import uuid
 
 import numpy
 import sqlalchemy
-from sqlalchemy_utils import UUIDType
+import sqlalchemy_utils
 
 from ._base import Base
 
@@ -25,9 +25,7 @@ class Moment(Base):
 
     description = sqlalchemy.Column(sqlalchemy.Enum(MomentType))
 
-    id = sqlalchemy.Column(UUIDType(binary=False), primary_key=True)
-
-    instance_id = sqlalchemy.Column(UUIDType(binary=False), sqlalchemy.ForeignKey("instances.id"))
+    instance_id = sqlalchemy.Column(sqlalchemy_utils.UUIDType(binary=False), sqlalchemy.ForeignKey("instances.id"))
 
     p = sqlalchemy.Column(sqlalchemy.Integer)
     q = sqlalchemy.Column(sqlalchemy.Integer)

@@ -1,7 +1,6 @@
 import uuid
 
 import sqlalchemy
-import sqlalchemy_utils
 
 from ._base import Base
 
@@ -13,8 +12,6 @@ class Box(Base):
 
     centroid_x = sqlalchemy.Column(sqlalchemy.Integer)
     centroid_y = sqlalchemy.Column(sqlalchemy.Integer)
-
-    id = sqlalchemy.Column(sqlalchemy_utils.UUIDType(binary=False), primary_key=True)
 
     maximum_x = sqlalchemy.Column(sqlalchemy.Integer)
     maximum_y = sqlalchemy.Column(sqlalchemy.Integer)
