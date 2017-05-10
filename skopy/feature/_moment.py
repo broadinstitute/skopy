@@ -11,11 +11,13 @@ from ._base import Base
 class MomentType(enum.Enum):
     central = 1
 
-    normalized = 2
+    inertia = 2
 
-    spatial = 3
+    normalized = 3
 
-    zernike = 4
+    spatial = 4
+
+    zernike = 5
 
 
 class Moment(Base):

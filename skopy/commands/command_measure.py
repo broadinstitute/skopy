@@ -10,10 +10,16 @@ import skimage.io
 import skimage.measure
 import sqlalchemy
 import sqlalchemy.orm
+import numpy
+import psycopg2.extensions
 
 import skopy.command
 import skopy.feature
 
+psycopg2.extensions.register_adapter(numpy.float64, psycopg2.extensions.AsIs)
+psycopg2.extensions.register_adapter(numpy.uint64, psycopg2.extensions.AsIs)
+psycopg2.extensions.register_adapter(numpy.uint8, psycopg2.extensions.AsIs)
+psycopg2.extensions.register_adapter(numpy.int64, psycopg2.extensions.AsIs)
 
 @click.command("measure")
 @click.argument("metadata", nargs=1, type=click.Path(exists=True))
@@ -23,6 +29,7 @@ def command(metadata, database, verbose):
     """
 
     """
+
     engine = sqlalchemy.create_engine(database, echo=verbose)
 
     skopy.feature.Base.metadata.drop_all(engine)
@@ -75,6 +82,11 @@ def command(metadata, database, verbose):
                         moment = skopy.feature.Moment.measure(description, p, q, moments, weighted)
 
                         instance.moments.append(moment)
+
+                for p, q in itertools.product(range(0, 2), range(0, 2)):
+                    moment = skopy.feature.Moment.measure(skopy.feature.MomentType.inertia, p, q, properties.inertia_tensor, False)
+
+                    instance.moments.append(moment)
 
                 moments_zernike = {
                     1: mahotas.features.zernike_moments(properties.intensity_image, 1),
