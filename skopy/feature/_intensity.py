@@ -1,5 +1,8 @@
+import uuid
+
 import numpy
 import sqlalchemy
+import sqlalchemy_utils
 
 from ._base import Base
 
@@ -7,7 +10,7 @@ from ._base import Base
 class Intensity(Base):
     __tablename__ = "intensities"
 
-    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    id = sqlalchemy.Column(sqlalchemy_utils.UUIDType(binary=False), primary_key=True)
 
     integrated = sqlalchemy.Column(sqlalchemy.Float)
 
@@ -29,23 +32,20 @@ class Intensity(Base):
 
     standard_deviation = sqlalchemy.Column(sqlalchemy.Float)
 
-    def __init__(self, image):
-        self.integrated = numpy.sum(image)
+    @staticmethod
+    def measure(image):
+        properties = {
+            "id": uuid.uuid4(),
+            "integrated": numpy.sum(image),
+            "maximum": numpy.max(image),
+            "mean": numpy.mean(image),
+            "median": numpy.median(image),
+            "median_absolute_deviation": numpy.median(numpy.abs(numpy.ma.array(image).compressed() - numpy.median(image))),
+            "minimum": numpy.min(image),
+            "quartile_1": numpy.percentile(image, 25),
+            "quartile_2": numpy.percentile(image, 50),
+            "quartile_3": numpy.percentile(image, 75),
+            "standard_deviation": numpy.std(image)
+        }
 
-        self.maximum = numpy.max(image)
-
-        self.mean = numpy.mean(image)
-
-        self.median = numpy.median(image)
-
-        self.median_absolute_deviation = numpy.median(numpy.abs(numpy.ma.array(image).compressed() - numpy.median(image)))
-
-        self.minimum = numpy.min(image)
-
-        self.quartile_1 = numpy.percentile(image, 25)
-
-        self.quartile_2 = numpy.percentile(image, 50)
-
-        self.quartile_3 = numpy.percentile(image, 75)
-
-        self.standard_deviation = numpy.std(image)
+        return Intensity(**properties)

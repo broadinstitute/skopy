@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import itertools
+import uuid
 
 import click
+import mahotas.features
 import pandas
+import skimage.io
+import skimage.measure
 import sqlalchemy
 import sqlalchemy.orm
 
@@ -21,6 +25,8 @@ def command(metadata, database, verbose):
     """
     engine = sqlalchemy.create_engine(database, echo=verbose)
 
+    skopy.feature.Base.metadata.drop_all(engine)
+
     skopy.feature.Base.metadata.create_all(engine)
 
     session = sqlalchemy.orm.sessionmaker()
@@ -33,17 +39,65 @@ def command(metadata, database, verbose):
 
     pairs = [(image, mask) for _, image, mask in metadata.itertuples()]
 
+    images = []
+
     with click.progressbar(pairs) as pairs:
         for pathname, mask in pairs:
-            image = skopy.feature.Image(pathname, mask)
+            x_data = skimage.io.imread(pathname)
+            y_data = skimage.io.imread(mask)
 
-            session.add(image)
+            image = skopy.feature.Image.measure(pathname)
 
-    pairs = itertools.product(metadata["image"].unique(), metadata["label"].unique())
+            image.intensity = skopy.feature.Intensity.measure(x_data)
 
-    for x, y in pairs:
-        correlation = skopy.feature.Correlation(x, y)
+            images.append(image)
 
-        session.add(correlation)
+            for properties in skimage.measure.regionprops(y_data, x_data):
+                instance = skopy.feature.Instance.measure(properties)
+
+                instance.box = skopy.feature.Box.measure(properties)
+
+                instance.intensity = skopy.feature.Intensity.measure(properties.intensity_image)
+
+                instance.shape = skopy.feature.Shape.measure(properties)
+
+                moment_types = [
+                    (skopy.feature.MomentType.central, properties.moments_central, False),
+                    (skopy.feature.MomentType.central, properties.weighted_moments_central, True),
+                    (skopy.feature.MomentType.normalized, properties.moments_normalized, False),
+                    (skopy.feature.MomentType.normalized, properties.weighted_moments_normalized, True),
+                    (skopy.feature.MomentType.spatial, properties.moments, False),
+                    (skopy.feature.MomentType.spatial, properties.weighted_moments, True)
+                ]
+
+                for description, moments, weighted in moment_types:
+                    for p, q in itertools.product(range(0, 3), range(0, 3)):
+                        moment = skopy.feature.Moment.measure(description, p, q, moments, weighted)
+
+                        instance.moments.append(moment)
+
+                moments_zernike = {
+                    1: mahotas.features.zernike_moments(properties.intensity_image, 1),
+                    2: mahotas.features.zernike_moments(properties.intensity_image, 2),
+                    3: mahotas.features.zernike_moments(properties.intensity_image, 3)
+                }
+
+                for p, q in itertools.product(range(0, 3), range(0, 25)):
+                    parameters = {
+                        "description": skopy.feature.MomentType.zernike,
+                        "id": uuid.uuid4(),
+                        "p": p + 1,
+                        "q": q + 1,
+                        "weighted": False,
+                        "y": moments_zernike[p + 1][q],
+                    }
+
+                    moment = skopy.feature.Moment(**parameters)
+
+                    instance.moments.append(moment)
+
+                image.instances.append(instance)
+
+    session.add_all(images)
 
     session.commit()

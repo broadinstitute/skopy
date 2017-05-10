@@ -1,6 +1,9 @@
 import enum
+import uuid
 
+import numpy
 import sqlalchemy
+from sqlalchemy_utils import UUIDType
 
 from ._base import Base
 
@@ -18,25 +21,28 @@ class MomentType(enum.Enum):
 class Moment(Base):
     __tablename__ = "moments"
 
-    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
-
-    instance_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("instances.id"))
-
     description = sqlalchemy.Column(sqlalchemy.Enum(MomentType))
 
-    weighted = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
+    id = sqlalchemy.Column(UUIDType(binary=False), primary_key=True)
+
+    instance_id = sqlalchemy.Column(UUIDType(binary=False), sqlalchemy.ForeignKey("instances.id"))
 
     p = sqlalchemy.Column(sqlalchemy.Integer)
     q = sqlalchemy.Column(sqlalchemy.Integer)
 
+    weighted = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
+
     y = sqlalchemy.Column(sqlalchemy.Float)
 
-    def __init__(self, description, p, q, y, weighted=False):
-        self.description = description
+    @staticmethod
+    def measure(description, p, q, moments, weighted):
+        parameters = {
+            "description": description,
+            "id": uuid.uuid4(),
+            "p": p + 1,
+            "q": q + 1,
+            "weighted": weighted,
+            "y": 0 if numpy.isnan(moments[p, q]) else moments[p, q]
+        }
 
-        self.weighted = weighted
-
-        self.p = p
-        self.q = q
-
-        self.y = y
+        return Moment(**parameters)

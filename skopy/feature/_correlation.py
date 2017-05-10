@@ -1,14 +1,15 @@
 import skimage.io
 import skimage.measure
 import sqlalchemy
-
+from sqlalchemy_utils import UUIDType
+import uuid
 from ._base import Base
 
 
 class Correlation(Base):
     __tablename__ = "correlations"
 
-    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    id = sqlalchemy.Column(UUIDType(binary=False), primary_key=True)
 
     x_pathname = sqlalchemy.Column(sqlalchemy.String)
     y_pathname = sqlalchemy.Column(sqlalchemy.String)
