@@ -14,6 +14,8 @@ class Shape(Base):
     axis_major = sqlalchemy.Column(sqlalchemy.Float)
     axis_minor = sqlalchemy.Column(sqlalchemy.Float)
 
+    convex_area = sqlalchemy.Column(sqlalchemy.Integer)
+
     eccentricity = sqlalchemy.Column(sqlalchemy.Float)
 
     equivalent_diameter = sqlalchemy.Column(sqlalchemy.Float)
@@ -36,6 +38,7 @@ class Shape(Base):
             "area": properties.area,
             "axis_major": properties.major_axis_length,
             "axis_minor": properties.minor_axis_length,
+            "convex_area": properties.convex_area,
             "eccentricity": properties.eccentricity,
             "equivalent_diameter": properties.equivalent_diameter,
             "euler_number": properties.euler_number,

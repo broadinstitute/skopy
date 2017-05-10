@@ -24,7 +24,7 @@ psycopg2.extensions.register_adapter(numpy.int64, psycopg2.extensions.AsIs)
 @click.command("measure")
 @click.argument("metadata", nargs=1, type=click.Path(exists=True))
 @click.option("--database", default="sqlite:///measurements.sqlite")
-@click.option("--verbose", is_flag=False)
+@click.option("--verbose", is_flag=True)
 def command(metadata, database, verbose):
     """
 

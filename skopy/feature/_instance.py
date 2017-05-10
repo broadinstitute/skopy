@@ -3,7 +3,6 @@ import uuid
 import sqlalchemy
 import sqlalchemy.orm
 import sqlalchemy_utils
-import geoalchemy2
 
 from ._base import Base
 
@@ -14,7 +13,8 @@ class Instance(Base):
     box_id = sqlalchemy.Column(sqlalchemy_utils.UUIDType(binary=False), sqlalchemy.ForeignKey("boxes.id"))
     box = sqlalchemy.orm.relationship("Box", backref=sqlalchemy.orm.backref("instance", uselist=False))
 
-    centroid = geoalchemy2.Geometry("POINT")
+    centroid_x = sqlalchemy.Column(sqlalchemy.Integer)
+    centroid_y = sqlalchemy.Column(sqlalchemy.Integer)
 
     id = sqlalchemy.Column(sqlalchemy_utils.UUIDType(binary=False), primary_key=True)
 
@@ -33,9 +33,10 @@ class Instance(Base):
     @staticmethod
     def measure(properties):
         parameters = {
-            "centroid": "POINT({} {})".format(properties.centroid[0], properties.centroid[1]),
+            "centroid_x": properties.centroid[0],
+            "centroid_y": properties.centroid[1],
             "id": uuid.uuid4(),
-            "index": properties.label
+            "index": properties.label,
         }
 
         return Instance(**parameters)
