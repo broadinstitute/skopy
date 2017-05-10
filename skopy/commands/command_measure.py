@@ -1,19 +1,10 @@
-# -*- coding: utf-8 -*-
-
 import click
-import numpy
 import pandas
-import psycopg2.extensions
 import sqlalchemy
 import sqlalchemy.orm
 
 import skopy.command
 import skopy.feature
-
-psycopg2.extensions.register_adapter(numpy.float64, psycopg2.extensions.AsIs)
-psycopg2.extensions.register_adapter(numpy.uint64, psycopg2.extensions.AsIs)
-psycopg2.extensions.register_adapter(numpy.uint8, psycopg2.extensions.AsIs)
-psycopg2.extensions.register_adapter(numpy.int64, psycopg2.extensions.AsIs)
 
 
 @click.command("measure")
@@ -35,14 +26,12 @@ def command(metadata, database, verbose):
 
     metadata = pandas.read_csv(metadata)
 
-    images = []
+    progress = click.progressbar([(pathname, mask) for _, pathname, mask in metadata.itertuples()])
 
-    with click.progressbar([(pathname, mask) for _, pathname, mask in metadata.itertuples()]) as metadata:
+    with progress as metadata:
         for pathname, mask in metadata:
             image = skopy.feature.extract(pathname, mask)
 
-            images.append(image)
-
-    session.add_all(images)
+            session.add(image)
 
     session.commit()
