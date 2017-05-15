@@ -1,8 +1,6 @@
-skopy
-=====
+# skopy
 
-Task queue
-----------
+## Task queue
 
 A task queue is a mechanism to distribute work (e.g. feature extraction) across threads or machines. A task queue’s unit of work is a task. One, or many, dedicated worker processes monitor Skopy’s task queue for new work to perform.
 
@@ -10,29 +8,31 @@ Skopy uses a message broker to mediate between clients and workers. To initiate 
 
 Skopy can run on a single machine, on multiple machines, or even across data centers.
 
-Prerequisites
+### Prerequisites
 
 Skopy requires a message broker to send and receive messages.
 
 There’re four choices:
 
-RabbitMQ
+#### RabbitMQ
 
 RabbitMQ is feature-complete, stable, durable and easy to install. It’s an excellent choice for a production environment.
 
-Redis
+#### Redis
 
 Redis is feature-complete, but is susceptible to data loss in the event of abrupt termination or power failures.
 
-Amazon Simple Queue Service (SQS)
+#### Amazon Simple Queue Service (SQS)
 
-Apache ZooKeeper
+#### Apache ZooKeeper
 
-Use
+### Use
 
 You can run the worker by executing the following:
 
+```sh
 $ celery -A skopy.task worker --loglevel=info
+```
 
 In production you’ll want to run the worker in the background as a daemon. To do this you need to use the tools provided by your platform, or something like supervisord (see Daemonization for more information).
 
