@@ -1,12 +1,14 @@
 import itertools
 
 import mahotas.features
+import skimage.feature
 import skimage.io
 import skimage.measure
 
 from ._base import Base
 from ._box import Box
 from ._correlation import Correlation
+from ._description import Description
 from ._image import Image
 from ._instance import Instance
 from ._intensity import Intensity
@@ -14,11 +16,28 @@ from ._moment import Moment, MomentType
 from ._shape import Shape
 
 
+def describe(image):
+    descriptor = skimage.feature.ORB()
+
+    descriptor.detect_and_extract(image)
+
+    descriptions = []
+
+    for index in range(0, descriptor.n_keypoints):
+        description = Description.measure(index, descriptor)
+
+        descriptions.append(description)
+
+    return descriptions
+
+
 def extract(pathname, mask):
     x_data = skimage.io.imread(pathname)
     y_data = skimage.io.imread(mask)
 
     image = Image.measure(pathname)
+
+    image.descriptions = describe(x_data)
 
     image.intensity = Intensity.measure(x_data)
 
