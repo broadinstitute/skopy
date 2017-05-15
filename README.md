@@ -56,7 +56,7 @@ For a complete listing of the command-line options available, try:
 $  celery worker --help
 ```
 
-After you’ve started a worker, pass the `--distribute` flag to the skopy command to distribute work to your running workers:
+Use the `--distribute` flag to distribute work to your running workers:
 
 ```sh
 $ skopy measure skopy/data/metadata.csv --database "postgresql+psycopg2://skopy@127.0.0.1/skopy" --distribute
