@@ -46,7 +46,7 @@ def command(metadata, database, distribute, verbose):
             mask = os.path.join(directory, mask)
 
             if distribute:
-                skopy.task.measure.delay(pathname, mask)
+                skopy.task.measure.delay(database, pathname, mask)
             else:
                 image = skopy.feature.extract(pathname, mask)
 

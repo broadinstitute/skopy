@@ -10,7 +10,7 @@ application = celery.Celery("tasks", backend="rpc://", broker="amqp://localhost"
 
 class Task(celery.Task):
     def __init__(self):
-        self.database = "postgresql+psycopg2://allen@localhost/skopy-test"
+        self.database = None
 
         self.echo = False
 
@@ -54,7 +54,9 @@ application.steps["worker"].add(Step)
 
 
 @application.task(base=Task, bind=True)
-def measure(self, pathname, mask):
+def measure(self, database, pathname, mask):
+    self.database = database
+
     image = skopy.feature.extract(pathname, mask)
 
     self.session.add(image)
