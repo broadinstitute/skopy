@@ -1,5 +1,9 @@
 # skopy
 
+```sh
+$ skopy measure skopy/data/metadata.csv
+```
+
 ## Installation
 
 ```sh
