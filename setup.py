@@ -12,8 +12,10 @@ setuptools.setup(
         "click",
         "mahotas",
         "numpy",
+        "pandas",
         "scikit-image",
-        "sqlalchemy"
+        "sqlalchemy",
+        "sqlalchemy-utils"
     ],
     name="skopy",
     packages=[
