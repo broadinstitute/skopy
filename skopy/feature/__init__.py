@@ -19,14 +19,19 @@ from ._shape import Shape
 def describe(image):
     descriptor = skimage.feature.ORB()
 
-    descriptor.detect_and_extract(image)
-
     descriptions = []
+    try:
+        descriptor.detect_and_extract(image)
 
-    for index in range(0, len(descriptor.keypoints)):
-        description = Description.measure(index, descriptor)
+        descriptions = []
 
-        descriptions.append(description)
+        for index in range(0, len(descriptor.keypoints)):
+            description = Description.measure(index, descriptor)
+
+            descriptions.append(description)
+
+    except:
+        pass
 
     return descriptions
 
