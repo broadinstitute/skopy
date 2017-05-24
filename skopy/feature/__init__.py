@@ -23,7 +23,7 @@ def describe(image):
 
     descriptions = []
 
-    for index in range(0, descriptor.n_keypoints):
+    for index in range(0, len(descriptor.keypoints)):
         description = Description.measure(index, descriptor)
 
         descriptions.append(description)
