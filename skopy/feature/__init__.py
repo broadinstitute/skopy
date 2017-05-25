@@ -30,8 +30,10 @@ def describe(image):
 
             descriptions.append(description)
 
-    except:
+    except (RuntimeError):
         pass
+
+
 
     return descriptions
 
