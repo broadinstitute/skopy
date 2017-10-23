@@ -10,11 +10,13 @@ import skimage.io
 import skimage.measure
 import skimage.segmentation
 
+import skopy.command
+
 
 @click.command("identify")
 @click.argument(
-    "image",
-    nargs=1,
+    "images",
+    nargs=-1,
     type=click.Path(exists=True)
 )
 @click.option(
@@ -31,39 +33,44 @@ import skimage.segmentation
          "for peaks at every point in an image.                              "
 )
 @click.option(
-    "--output"
+    "--output",
+    default="."
 )
-def command(image, sigma, footprint, output):
-    data = skimage.io.imread(image)
+def command(images, sigma, footprint, output):
+    progress = click.progressbar([image for image in images])
 
-    response = skimage.filters.gaussian(data, sigma)
+    with progress as images:
+        for image in images:
+            data = skimage.io.imread(image)
 
-    threshold = skimage.filters.threshold_isodata(response)
+            response = skimage.filters.gaussian(data, sigma)
 
-    mask = numpy.zeros_like(response, numpy.uint8)
+            threshold = skimage.filters.threshold_isodata(response)
 
-    mask[response > threshold] = 255
+            mask = numpy.zeros_like(response, numpy.uint8)
 
-    mask = skimage.exposure.rescale_intensity(mask)
+            mask[response > threshold] = 255
 
-    distance = scipy.ndimage.distance_transform_edt(mask)
+            mask = skimage.exposure.rescale_intensity(mask)
 
-    distance = skimage.exposure.rescale_intensity(distance)
+            distance = scipy.ndimage.distance_transform_edt(mask)
 
-    footprint = numpy.ones((footprint, footprint))
+            distance = skimage.exposure.rescale_intensity(distance)
 
-    peaks = skimage.feature.peak_local_max(
-        distance,
-        indices=False,
-        footprint=footprint
-    )
+            footprint = numpy.ones((footprint, footprint))
 
-    markers = skimage.measure.label(peaks)
+            peaks = skimage.feature.peak_local_max(
+                distance,
+                indices=False,
+                footprint=footprint
+            )
 
-    labels = skimage.segmentation.watershed(-distance, markers)
+            markers = skimage.measure.label(peaks)
 
-    labels *= mask
+            labels = skimage.segmentation.watershed(-distance, markers)
 
-    pathname = os.path.join(output, os.path.basename(image))
+            labels *= mask
 
-    skimage.io.imsave(pathname, labels)
+            pathname = os.path.join(output, os.path.basename(image))
+
+            skimage.io.imsave(pathname, labels)
