@@ -1,9 +1,8 @@
-import celery.bin
 import celery.bootsteps
 import sqlalchemy.orm
 
 import skopy.command
-import skopy.feature
+import skopy.feature_extraction.image
 
 application = celery.Celery("tasks", backend="rpc://", broker="amqp://localhost")
 
@@ -21,9 +20,9 @@ class Task(celery.Task):
         if self._session is None:
             engine = sqlalchemy.create_engine(self.database, echo=self.echo)
 
-            skopy.feature.Base.metadata.drop_all(engine)
+            skopy.feature_extraction.image.Base.metadata.drop_all(engine)
 
-            skopy.feature.Base.metadata.create_all(engine)
+            skopy.feature_extraction.image.Base.metadata.create_all(engine)
 
             session = sqlalchemy.orm.sessionmaker()
 
@@ -57,7 +56,7 @@ application.steps["worker"].add(Step)
 def measure(self, database, pathname, mask):
     self.database = database
 
-    image = skopy.feature.extract(pathname, mask)
+    image = skopy.feature_extraction.image.extract(pathname, mask)
 
     self.session.add(image)
 

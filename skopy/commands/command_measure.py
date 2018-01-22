@@ -6,7 +6,7 @@ import sqlalchemy
 import sqlalchemy.orm
 
 import skopy.command
-import skopy.feature
+import skopy.feature_extraction.image
 import skopy.task
 
 
@@ -21,9 +21,9 @@ def command(metadata, database, distribute, verbose):
     else:
         engine = sqlalchemy.create_engine(database, echo=verbose)
 
-        skopy.feature.Base.metadata.drop_all(engine)
+        skopy.feature_extraction.image.Base.metadata.drop_all(engine)
 
-        skopy.feature.Base.metadata.create_all(engine)
+        skopy.feature_extraction.image.Base.metadata.create_all(engine)
 
         session = sqlalchemy.orm.sessionmaker()
 
@@ -48,7 +48,7 @@ def command(metadata, database, distribute, verbose):
             if distribute:
                 skopy.task.measure.delay(database, pathname, mask)
             else:
-                image = skopy.feature.extract(pathname, mask)
+                image = skopy.feature_extraction.image.extract(pathname, mask)
 
                 session.add(image)
 

@@ -28,7 +28,7 @@ import skopy.command
 )
 @click.option(
     "--footprint",
-    default=1,
+    default=16,
     help="The footprint represents the local region within which to search   "
          "for peaks at every point in an image.                              "
 )
