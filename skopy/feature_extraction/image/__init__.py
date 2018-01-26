@@ -9,6 +9,16 @@ import skimage.measure
 import skimage.exposure
 
 
+def combine(dictionaries):
+    combined = {}
+
+    for dictionary in dictionaries:
+        for key, value in dictionary.items():
+            combined.setdefault(key, []).append(value)
+
+    return combined
+
+
 def extract_local_binary_patterns_features(image, points=None, radius=None):
     if points is None:
         points = [6, 12]
@@ -77,14 +87,33 @@ def extract_graylevel_cooccurrence_features(image, maximum_distance=8):
     return texture_features
 
 
-def combine(dictionaries):
-    combined = {}
+def extract_threshold_adjacency_statistics_features(image):
+    features = {}
 
-    for dictionary in dictionaries:
-        for key, value in dictionary.items():
-            combined.setdefault(key, []).append(value)
+    threshold_adjacency_statistics = mahotas.features.tas(image)
 
-    return combined
+    for feature_index, feature in enumerate(threshold_adjacency_statistics):
+        features[f"threshold_adjacency_statistics_{feature_index}"] = feature
+
+    return features
+
+
+def extract_zernike_features(image, degrees=None, radiuses=None):
+    if degrees is None:
+        degrees = [8]
+
+    if radiuses is None:
+        radiuses = [8, 16]
+
+    features = {}
+
+    for degree, radius in itertools.product(degrees, radiuses):
+        zernike_moments = mahotas.features.zernike_moments(image, radius, degree)
+
+        for feature_index, feature in enumerate(zernike_moments):
+            features[f"moments_zernike_{degree}_{radius}_{feature_index}"] = feature
+
+    return features
 
 
 def extract_image_features(image):
@@ -230,6 +259,14 @@ def extract_object_features(image, label_image):
         texture_features = extract_graylevel_cooccurrence_features(region_property.intensity_image)
 
         features.update(texture_features)
+
+        zernike_features = extract_zernike_features(region_property.intensity_image)
+
+        features.update(zernike_features)
+
+        threshold_adjacency_statistics_features = extract_threshold_adjacency_statistics_features(region_property.intensity_image)
+
+        features.update(threshold_adjacency_statistics_features)
 
         local_binary_patterns_features = extract_local_binary_patterns_features(region_property.intensity_image)
 
