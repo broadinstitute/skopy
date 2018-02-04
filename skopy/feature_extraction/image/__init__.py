@@ -307,9 +307,9 @@ def extract_object_features(image, label_image):
             "solidity": region_property.solidity,
         }
 
-        texture_features = extract_graylevel_cooccurrence_features(region_property.intensity_image)
+        # texture_features = extract_graylevel_cooccurrence_features(region_property.intensity_image)
 
-        features.update(texture_features)
+        # features.update(texture_features)
 
         zernike_features = extract_zernike_features(region_property.intensity_image)
 
