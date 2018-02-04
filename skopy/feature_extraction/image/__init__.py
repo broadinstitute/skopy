@@ -21,10 +21,10 @@ def combine(dictionaries):
 
 def extract_local_binary_patterns_features(image, points=None, radius=None):
     if points is None:
-        points = [6, 12]
+        points = [6]
 
     if radius is None:
-        radius = [8, 16]
+        radius = [8]
 
     def create_keys(name, radius, points):
         triplets = itertools.product(radius, points, range(14))
@@ -154,7 +154,7 @@ def extract_zernike_features(image, degrees=None, radiuses=None):
         degrees = [8]
 
     if radiuses is None:
-        radiuses = [8, 16]
+        radiuses = [8]
 
     features = {}
 
