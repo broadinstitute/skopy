@@ -29,7 +29,7 @@ def extract_local_binary_patterns_features(image, points=None, radius=None):
     def create_keys(name, radius, points):
         triplets = itertools.product(radius, points, range(14))
 
-        return [f"{name}_{key}_{radius}_{points}" for (radius, points, key) in triplets]
+        return [f"{name}_{key:02}_{radius:02}_{points:02}" for (radius, points, key) in triplets]
 
     keys = create_keys("local_binary_patterns", radius, points)
 
@@ -41,6 +41,57 @@ def extract_local_binary_patterns_features(image, points=None, radius=None):
         values += list(features)
 
     return dict(zip(keys, values))
+
+
+def extract_haralick_features(image, distances=None):
+    if distances is None:
+        distances = [8]
+
+    image = skimage.exposure.rescale_intensity(image, out_range=numpy.uint8)
+
+    image = image.astype(numpy.uint8)
+
+    directions = [0, 90, 180, 270]
+
+    def create_key(name, feature, direction, distance):
+        return f"{name}_{feature}_{distance}_{direction:03}"
+
+    features = [
+        "angular_second_moment",
+        "contrast",
+        "correlation",
+        "sum_of_squares_variance",
+        "inverse_difference_moment",
+        "sum_average",
+        "sum_variance",
+        "sum_entropy",
+        "entropy",
+        "difference_variance",
+        "difference_entropy",
+        "information_measure_of_correlation_1",
+        "information_measure_of_correlation_2"
+    ]
+
+    haralick_features = numpy.zeros((len(distances), 4, 13))
+
+    for distance_index, distance in enumerate(distances):
+        try:
+            haralick_features[distance_index] = mahotas.features.haralick(image, distance=distance, ignore_zeros=False)
+        except ValueError:
+            haralick_features[distance_index] = numpy.zeros((4, 13))
+
+            haralick_features[distance_index] = numpy.nan
+
+    parameters = itertools.product(range(len(distances)), range(len(directions)), range(len(features)))
+
+    texture_features = {}
+
+    for distance_index, direction_index, feature_index in parameters:
+        key = create_key("haralick", features[feature_index], directions[direction_index], distances[distance_index])
+
+        texture_features[key] = haralick_features[distance_index, direction_index, feature_index]
+
+    return texture_features
 
 
 def extract_graylevel_cooccurrence_features(image, maximum_distance=8):
@@ -93,7 +144,7 @@ def extract_threshold_adjacency_statistics_features(image):
     threshold_adjacency_statistics = mahotas.features.tas(image)
 
     for feature_index, feature in enumerate(threshold_adjacency_statistics):
-        features[f"threshold_adjacency_statistics_{feature_index}"] = feature
+        features[f"threshold_adjacency_statistics_{feature_index:02}"] = feature
 
     return features
 
@@ -111,7 +162,7 @@ def extract_zernike_features(image, degrees=None, radiuses=None):
         zernike_moments = mahotas.features.zernike_moments(image, radius, degree)
 
         for feature_index, feature in enumerate(zernike_moments):
-            features[f"moments_zernike_{degree}_{radius}_{feature_index}"] = feature
+            features[f"moments_zernike_{degree}_{radius}_{feature_index:02}"] = feature
 
     return features
 
@@ -271,6 +322,10 @@ def extract_object_features(image, label_image):
         local_binary_patterns_features = extract_local_binary_patterns_features(region_property.intensity_image)
 
         features.update(local_binary_patterns_features)
+
+        haralick_features = extract_haralick_features(region_property.intensity_image)
+
+        features.update(haralick_features)
 
         extracted_features.append(features)
 
