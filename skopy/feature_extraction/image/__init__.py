@@ -307,6 +307,7 @@ def extract_object_features(image, label_image):
             "solidity": region_property.solidity,
         }
 
+        # FIXME: WAY TOO SLOW
         # texture_features = extract_graylevel_cooccurrence_features(region_property.intensity_image)
 
         # features.update(texture_features)

@@ -1,3 +1,10 @@
-image,label
-images/1.png,labels/1.png
-images/2.png,labels/2.png
+image_pathname,mask_pathname,metadata_object,metadata_description
+images/1.png,masks/1.png,nucleus,foo
+images/2.png,masks/2.png,nucleus,foo
+images/3.png,masks/3.png,nucleus,foo
+images/4.png,masks/4.png,nucleus,foo
+images/5.png,masks/5.png,nucleus,foo
+images/6.png,masks/6.png,nucleus,foo
+images/7.png,masks/7.png,nucleus,foo
+images/8.png,masks/8.png,nucleus,foo
+images/9.png,masks/9.png,nucleus,foo
