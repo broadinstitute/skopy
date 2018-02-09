@@ -37,6 +37,8 @@ def command(metadata, output):
 
             features = skopy.feature_extraction.image.extract_object_features(image, mask)
 
+            features["pathname"] = image_pathname
+            
             if os.path.exists(output):
                 with open(output, "a") as fd:
                     features.to_csv(fd, header=False, index=False)
