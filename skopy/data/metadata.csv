@@ -1,3 +1,10 @@
-image,label
-images/1.png,labels/1.png
-images/2.png,labels/2.png
+image_pathname,mask_pathname
+images/1.tif,masks/1.tif
+images/1.tif,masks/2.tif
+images/1.tif,masks/3.tif
+images/2.tif,masks/1.tif
+images/2.tif,masks/2.tif
+images/2.tif,masks/3.tif
+images/3.tif,masks/1.tif
+images/3.tif,masks/2.tif
+images/3.tif,masks/3.tif
