@@ -8,19 +8,16 @@ setuptools.setup(
     },
     include_package_data=True,
     install_requires=[
-        "celery",
         "click",
         "mahotas",
         "numpy",
         "pandas",
-        "scikit-image",
-        "sqlalchemy",
-        "sqlalchemy-utils"
+        "scikit-image"
     ],
     name="skopy",
     packages=[
         "skopy",
         "skopy.commands"
     ],
-    version="0.1.0"
+    version="0.2.0"
 )
