@@ -18,6 +18,8 @@ def command(metadata, output):
         with contextlib.suppress(FileNotFoundError):
             os.remove(output)
 
+    directory_pathname = os.path.dirname(metadata)
+
     metadata = pandas.read_csv(metadata)
 
     metadata = metadata.itertuples()
@@ -31,9 +33,9 @@ def command(metadata, output):
 
     with progress as metadata:
         for image_pathname, mask_pathname in metadata:
-            image = skimage.io.imread(image_pathname)
+            image = skimage.io.imread(os.path.join(directory_pathname, image_pathname))
 
-            mask = skimage.io.imread(mask_pathname)
+            mask = skimage.io.imread(os.path.join(directory_pathname, mask_pathname))
 
             features = skopy.feature_extraction.image.extract_object_features(image, mask)
 
