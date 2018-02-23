@@ -1,6 +1,8 @@
 *.egg-info
+*.lprof
 *.pyc
 *.sqlite
+.cache
 .DS_Store
 .idea
 .ipynb_checkpoints
