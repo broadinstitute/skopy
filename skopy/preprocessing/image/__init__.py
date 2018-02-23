@@ -9,6 +9,9 @@ def label(x, y):
     x, _, _ = skimage.segmentation.relabel_sequential(x)
     y, _, _ = skimage.segmentation.relabel_sequential(y)
 
+    x = skimage.img_as_uint(x, force_copy=True)
+    y = skimage.img_as_uint(y, force_copy=True)
+
     x_n = len(numpy.unique(x))
     y_n = len(numpy.unique(y))
 
