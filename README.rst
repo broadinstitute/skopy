@@ -13,4 +13,3 @@ Installation
 .. code:: sh
 
     $ pip install skopy
-
