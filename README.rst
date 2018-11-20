@@ -12,5 +12,5 @@ Installation
 
 .. code:: sh
 
-    $ pip install --editable .
+    $ pip install skopy
 
