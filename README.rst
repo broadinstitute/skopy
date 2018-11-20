@@ -5,7 +5,7 @@ Skopy is an application for image analysis. It’s a lightweight version of Cell
 
 .. code:: sh
 
-    $ skopy measure skopy/data/metadata.csv --output features.csv
+    $ skopy measure metadata.csv --output features.csv
 
 Installation
 ------------
