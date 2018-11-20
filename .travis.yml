@@ -1,0 +1,17 @@
+deploy:
+  on:
+    distributions: sdist bdist_wheel
+    repo: broadinstitute/skopy
+    tags: true
+  password:
+    secure: TkhrqujWjlycYVtrzdw4tc2XVL7zH2PqJIS+7iEYeV4/2c7Eyh353gynG5RORFFuyoWVu4Il8dC8MRX7iUH1LGnqO3/WT9vHYCJtvPpiq68hWtyuUjk3qa7E5M9XLCHvoz1Ipodvq1OYn05CKm1fZEc7JIAhDFow1bbr6s5kojroU+vhchyjaiOjtq+559I4YE0dKAapkr5v74tLPK7rx4HqeYFhYDlGk+7EIYKVrHdFm4aISZhQxmfxR7l+3gMrZrexm/8dU5hNjUPjLNORg2X5HHRyHdTkDhWdH/tGPLO2uxBLGX4nTic9AbWghrlFLmJi9nOCzHip0qMeLt9kajgpx7GaMJoCQWn7TiySIi+qOpGRPqE06x5K8w+seAOGBxXbP/Nx/H9FyVf4elIuu/Pzz9v898/Mp+AegIYW21OHwrWxemqbTPl5QlM9Oj0uY0oZLSYSR/Z9n9HCByNM+7MzFbslDf0iFsTq427oPu/h9CzVFWer7y2UV0h2mpGfPwq/nAT4TBHnhQVTbTgF3dQQ3rC4HI8XwDs4PXnDhiXISa8PKaYOi7xHxvOc/22ms02HX2hlW7NXbSbZgYH30D2/N/bqBhxxYAh8aC2jDXlMUrlEuP3/St76U0utOi8cuYtxR05/gwQ8N/FNqsmhkfHqT4S+JkvrNEN7KOfYcfs=
+  provider: pypi
+  user: '0x00b1'
+install:
+  - pip install -e .
+language: python
+python:
+  - "2.7"
+  - "3.6"
+script:
+  - pytest
